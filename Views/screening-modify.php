@@ -6,6 +6,7 @@ require_once('nav-bar.php');
     <main class="container clear centrado" >
         <div class="content">
             <div id="comments">
+            <?php if ($message) { echo "<h3>" . $message . "</h3><br>";} ?>
                 <span style="background-color: rgba(115, 64, 70, 0.9); padding: 10px">Modify Screening to cinema :<?php echo  $screening->getRoom()->getCinema()->getName() ." || Room : ". $screening->getRoom()->getName(); ?></span></h2>
                     <form action="<?php echo  FRONT_ROOT ."Screening/modify"?>" method="post" style="padding: 2rem !important;">
                     <table style="width: 75%;">

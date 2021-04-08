@@ -69,18 +69,25 @@ use Controllers\RoomController as RoomController;
             require_once(VIEWS_PATH."validate-session.php");
             
             $cinema = CinemaBdDao::MapearCinema($id_cinema);
-
-            $room = RoomBdDAO::MapearRoom($id_room);
-
         
             $screeningList = $this->screeningBdDAO->GetScreeningsFromARoom($id_room);
 
             require_once(VIEWS_PATH."screening-list-from-room.php");   
         }
 
+        public function ShowScreeningsOfCinema($id_cinema,$message="") {
+            
+            require_once(VIEWS_PATH."validate-session.php");
+
+            $cinema = CinemaBdDao::MapearCinema($id_cinema);
+
+            $screeningList = $this->screeningBdDAO->getCinemaScreening($id_cinema);
+
+            require_once(VIEWS_PATH."screening-list-from-room.php");   
+        }
                 
         
-        public function ShowModififyView($id_screening){
+        public function ShowModififyView($id_screening,$message =""){
 
             require_once(VIEWS_PATH."validate-session.php");
             
@@ -92,78 +99,201 @@ use Controllers\RoomController as RoomController;
             
         }
 
-        public function AddScreening($id_room,$id_movie, $date_screening, $hour_screening,$id_cinema) {
+        private function addAscreening($id_room,$id_movie, $date_screening, $hour_screening,$id_cinema){
 
-            require_once(VIEWS_PATH."validate-session.php");
-            //devuelve la sala ocupada en esa hora y dia
-
-            $valueScreening = $this->screeningBdDAO->GetScreeningsFromDateAndTime($id_room , $date_screening, $hour_screening);
-           
-            if($valueScreening != null){
-
-                $message = " Occupied room !!!";
-
-                $this->ShowAddScreeningView($id_cinema = null,$message);
-
-            }else{
-
-
-                //evaluar los 15 minutos de la sala en espera 
-
-
-                //funcion que me devuelbe los screening con igual fecha ingresado 
-
-                //lista de escreenig de igual fecha si es distinto de null busco la pelicula 
-
-            $room = RoomBdDAO::MapearRoom($id_room);
-            
             $movie = MovieBdDao::MapearMovie($id_movie);  
-
+    
+            $room = RoomBdDAO::MapearRoom($id_room);
+    
             $newScreening = new Screening($room,$movie,$date_screening, $hour_screening);
-           
+    
             $result = $this->screeningBdDAO->SaveScreeningInBd($newScreening);
-
+    
             if($result == 1) {
-
-                $message = "Screening added succesfully!";
-
-                $this->ShowScreeningsOfRoom($message,$id_cinema,$id_room);
-            }
-            else {
-
-                $message = "Screening added FAIL!";
-
-                require_once(VIEWS_PATH."screening-list-from-room.php");           
-            }
-
+    
+            $message = "Screening added succesfully!";
+    
+           $this->ShowAddScreeningView($id_cinema ,$message );
+    
+             }else{
+              
+            $message = "Screening added FAIL!";
+    
+            require_once(VIEWS_PATH."screening-list-from-room.php");    
+    
+            } 
+    
            }
 
-        }
+        private function evaluateTheTimeBetweenMvies($id_room,$date_screening,$hour_screening){
+
+        $screeningOfRoomDate = $this->screeningBdDAO->getScreeningsOfaRoomInDate($id_room ,$date_screening); 
 
 
-        public function modify($movie, $date , $time, $id_room,$id_screening){
-
-            require_once(VIEWS_PATH."validate-session.php");
-
-            $result = $this->screeningBdDAO->ModifyScreeningInBd($movie, $date, $time, $id_screening);
-
-            $room = RoomBdDao::MapearRoom($id_room);
-
-            if($result == 1) {
+            if($screeningOfRoomDate != null){
                 
-                $message = "Screening Modify Succefully!";
+                $minLeft = true;
 
-                $this->ShowScreeningsOfRoom($message, $room->getCinema()->getId_Cinema(), $id_room); 
-            }
-            else
-            {
+             $waiting = '00:15:00';
+            $waitings[1]=explode(':',$waiting);
+            $hour_screenings = $hour_screening.":00";
+            $arrayHMS[1]=explode(':',$hour_screenings);
+        
+                foreach($screeningOfRoomDate as $screening){
+
+                       if($minLeft == true){
+
+                    $hourScreening =$screening->getHour_screening();
+                    $arrayHMS[2]= explode(':',$hourScreening);
+                   
+                    if($screening->getHour_screening() > $hour_screenings){
+                       
+                        //MINUTOS DE LA siguiente al ingresar ,lo pongo en segundos las horas + los minutos ($screening->getHour_screening()) + los minutos de la pelicula + 15 minutos espera
+                        $totalMinScreening[1] = ($arrayHMS[1][0]*60)+$arrayHMS[1][1]+$screening->getMovie()->getDuration()+$waitings[1][1];
+                        //minutos del escreening que quiere ingresar
+                        $totalMinScreening[2] = ($arrayHMS[2][0]*60)+$arrayHMS[2][1]; 
+                        //total minutos entre medio 
+                        $minBetween = $totalMinScreening[2]-$totalMinScreening[1];
+                        
+                        if($minBetween>=0){
+                            $minLeft = true;
                 
-                $message = "ERROR: Failed in screening delete, reintente";
-                $this->ShowScreeningsOfRoom($message, $room->getCinema()->getId_Cinema(), $id_room); 
+                        }else{
+                            $minLeft = false;
+                        } 
+                    }else{
+                        //MINUTOS DE LA anterior al ingresar ,lo pongo en segundos las horas + los minutos ($screening->getHour_screening()) + los minutos de la pelicula + 15 minutos espera
+                        $totalMinScreening[2] = ($arrayHMS[2][0]*60)+$arrayHMS[2][1]+$screening->getMovie()->getDuration()+$waitings[1][1];
+                        //minutos del escreening que quiere ingresar
+                        $totalMinScreening[1] = ($arrayHMS[1][0]*60)+$arrayHMS[1][1]; 
+                        //total minutos entre medio 
+                        $minBetween = $totalMinScreening[1]-$totalMinScreening[2];
+                       
+                        if($minBetween>=0){
+                            $minLeft = true;
+                
+                        }else{
+                            $minLeft = false;
+                        }
+                     }
+
+                }
+                }//forr
             }
+
+        return $minLeft;
+    }
+
+    public function AddScreening($id_room,$id_movie, $date_screening, $hour_screening,$id_cinema) {
+
+        require_once(VIEWS_PATH."validate-session.php");
+
+      //pregunto si alguna funcion para ese dia tiene esa pelicula
+
+      $screening = $this->screeningBdDAO->getScreeningsDateAndMovie($id_movie , $date_screening);
+
+      if($screening !=null){
+
+        if($screening->getRoom()->getId_room() == $id_room){
+
+           $minLeft = $this->evaluateTheTimeBetweenMvies($id_room,$date_screening,$hour_screening);
+
             
+                if(!$minLeft){
+
+                    $message = " Room occupied day ".$date_screening ." and Time ".$hour_screening ."!" ;
+
+                     $this->ShowAddScreeningView($id_cinema,$message);    
+                
+                }else{
+
+                $this->addAscreening($id_room,$id_movie, $date_screening, $hour_screening,$id_cinema);
+                
+                }
+            
+            //si la sala no es igual existe una sala con esa pelicula
+            }else{
+
+                $message = " The movie ".$screening->getMovie()->getTitle() ." is already projected for the day ".$date_screening." at cinema ".$screening->getRoom()->getCinema()->getName() ." And Room ". $screening->getRoom()->getName() ."" ;
+            
+                $this->ShowAddScreeningView($id_cinema ,$message); 
+
+              }
+
+        }else{//cargar no hay funcion para esa pelicula
+
+            $this->addAscreening($id_room,$id_movie, $date_screening, $hour_screening,$id_cinema);
+        }
+      
+
+    }//funcion 
+
+
+
+    private function modyfyScreening($id_movie,$date_screening,$hour_screening, $id_room,$id_screening){
+
+        $result = $this->screeningBdDAO->ModifyScreeningInBd($id_movie, $date_screening, $hour_screening, $id_screening);
+
+        $room = RoomBdDao::MapearRoom($id_room);
+
+        if($result == 1) {
+            
+            $message = "Screening Modify Succefully!";
+
+            $this->ShowScreeningsOfRoom($message, $room->getCinema()->getId_Cinema(), $id_room); 
+        }
+        else
+        {
+            
+            $message = "ERROR: Failed in screening delete, reintente";
+            $this->ShowScreeningsOfRoom($message, $room->getCinema()->getId_Cinema(), $id_room); 
         }
 
+
+    }
+           
+    
+        public function modify($id_movie,$date_screening,$hour_screening, $id_room,$id_screening){
+
+         $screening = $this->screeningBdDAO->getScreeningsDateAndMovie($id_movie , $date_screening);
+
+        if($screening !=null){
+
+        if($screening->getRoom()->getId_room() == $id_room){
+
+           $minLeft =  $this->evaluateTheTimeBetweenMvies($id_room,$date_screening,$hour_screening);
+            
+                if(!$minLeft){
+
+                    $message = "Room occupied day ".$date_screening ."and Time ".$hour_screening ."!" ;
+
+                    $this->ShowModififyView($id_screening,$message);  
+                
+                }else{
+
+                $this->modyfyScreening($id_movie,$date_screening,$hour_screening, $id_room,$id_screening);
+                
+                }
+            
+            //si la sala no es igual existe una sala con esa pelicula
+            }else{
+
+                $message = " The movie ".$screening->getMovie()->getTitle() ." is already projected for the day ".$date_screening." at cinema ".$screening->getRoom()->getCinema()->getName() ." And Room ". $screening->getRoom()->getName() ."" ;
+            
+                $this->ShowModififyView($id_screening,$message); 
+
+              }
+
+        }else{//cargar no hay funcion para esa pelicula
+
+            $this->modyfyScreening($id_movie,$date_screening,$hour_screening, $id_room,$id_screening);
+        }
+      
+
+    }//funcion 
+
+            
+    
 
         public function RemoveScreeningFromDB($id_screening,$id_room)
         {   
@@ -366,6 +496,8 @@ public function GetAllScreeningsFromMovie($id_movie) {
 public function GetDatesOfScreenings() {
     return $this->screeningBdDAO->GetDatesOfScreenings();
 }*/
+
+
 
     
 

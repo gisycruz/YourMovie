@@ -55,11 +55,7 @@ public function getMoviesList() {
    
     $listScreening = $this->screeningBdDAO->getAllScreening();
 
-    $otro =date("AAAA-MM-DDTHH:MM",time());
-
-    echo $otro;
-
-    if(isset($listScreening)){
+    if( !empty($listScreening) ){
              
              foreach($listScreening as $screening){
             

@@ -71,13 +71,9 @@ use FFI\Exception;
                     $arrayResult[0] = $result;
                     $this->listScreening = $arrayResult;
                 }
-                
-                return $this->listScreening;
             }
-            else {
-                return $errorArray[0] = "Error al leer la base de datos.";
-            }
-    
+            
+            return $this->listScreening;
         }
 
         private function getScreeningsFromARoomDB($id_room){
@@ -253,7 +249,7 @@ use FFI\Exception;
 
         private function GetScreeningsFromDateAndTimeDB($id_room , $date_screening, $hour_screening) {
 
-            $query = "SELECT * FROM screening WHERE  idroom =:idroom  &&  date_screening = :date_screening  && hour_screening =:hour_screening";
+            $query = "SELECT * FROM  ". $this->tableName ." WHERE  idroom =:idroom  &&  date_screening = :date_screening  && hour_screening =:hour_screening";
 
 
             $parameters['idroom'] = $id_room;
@@ -338,15 +334,20 @@ use FFI\Exception;
 
          }
 
-         private function BringDatesOfScreeningsDb() {
+         private function getScreeningsDbDateAndMovie($id_movie ,$date_screening) {
 
-            $query = "select distinct s.date_screening
-                        from screening s;";
+            $query = "SELECT id_screening 
+            from " . $this->tableName ."
+            WHERE (date_screening =:datescreening) && (idmovie =:idmovie) limit 1";
+
+            $parameters['datescreening'] =$date_screening;
+            $parameters['idmovie'] =$id_movie;
+          
 
             try{
 
                 $this->connection = Connection::GetInstance();
-                return $this->connection->Execute($query);
+                $result = $this->connection->Execute($query,$parameters);
 
 
             } catch (Exception $ex) {
@@ -354,11 +355,186 @@ use FFI\Exception;
                 throw $ex->getMessage();
             }
 
+            return $result;
+
         }
 
+        public function getScreeningsDateAndMovie($id_movie , $date_screening) {
+            
+            $screeningArray = $this->getScreeningsDbDateAndMovie($id_movie , $date_screening);
+
+            if(!empty($screeningArray)){
+
+               foreach($screeningArray as $value){
+
+               $screening = $this->MapearScreening($value['id_screening']);
+               }
+
+               }else {
+
+                    $screening = null;
+                }
+
+               
+                return $screening;
+            }
+
+            private function getIdRoomOfMovieDb($id_movie) {
+
+                $query = " select idroom 
+                from screening  
+               inner join room  
+               on id_room = idroom
+               where idmovie =:idmovie";
+               
+                $parameters['idmovie'] =$id_movie;
+            
+    
+                try{
+    
+                    $this->connection = Connection::GetInstance();
+                    $result = $this->connection->Execute($query,$parameters);
+    
+    
+                } catch (Exception $ex) {
+    
+                    throw $ex->getMessage();
+                }
+    
+                return $result;
+    
+            }
+
+            public function getIdRoomOfMovie($id_movie) {
+            
+                $screeningArray = $this->getIdRoomOfMovieDb($id_movie);
+    
+                $listRoom = [];
+    
+                if(!empty($screeningArray)) {
+    
+                   foreach($screeningArray as $value){
+    
+                      array_push($listRoom ,RoomBdDAO::MapearRoom($value['idroom']));
+                   }
+    
+                   }else {
+    
+                        $listRoom = null;
+                    }
+    
+                   
+                    return $listRoom;
+                }
+
+
+
+                private function getScreeningsOfaRoomInDateDB($id_room ,$date_screening){
+
+
+                    $query = "SELECT * FROM screening
+                     WHERE  (idroom =:id_room) &&  date_screening =(:datescreening)  ORDER BY hour_screening desc ";
+
+
+                       $parameters['id_room'] = $id_room;
+                       $parameters['datescreening'] =$date_screening;
+                      
+
+                       try{
+    
+                        $this->connection = Connection::GetInstance();
+                        $result = $this->connection->Execute($query,$parameters);
+        
+        
+                    } catch (Exception $ex) {
+        
+                        throw $ex->getMessage();
+                    }
+        
+                    return $result;
+
+
+                }
+                public function getScreeningsOfaRoomInDate($id_room ,$date_screening){
+
+
+                    $screeningArray = $this->getScreeningsOfaRoomInDateDB($id_room ,$date_screening );
+
+                    $listScreening = [];
+    
+                    if(!empty($screeningArray)) {
+        
+                       foreach($screeningArray as $value){
+        
+                          array_push($listScreening ,ScreeningBdDAO::MapearScreening($value['id_screening']));
+                       }
+        
+                       }else {
+        
+                            $listScreening = null;
+                        }
+        
+                       
+                        return $listScreening;
+                    }
+         
+                 
+
+   private function getCinemaScreeningBd($id_cinema){
+
+    $query = "SELECT s.id_screening,s.idroom ,s.idmovie ,s.date_screening,s.hour_screening 
+    from screening s
+    inner join room r
+    on s.idroom = r.id_room
+    where r.idcinema =(:idcinema)
+    group by s.id_screening
+    ORDER BY  s.date_screening ,s.hour_screening desc; ";
+
+
+      $parameters['idcinema'] = $id_cinema;
+    
+      try{
+
+       $this->connection = Connection::GetInstance();
+       $result = $this->connection->Execute($query,$parameters);
+
+
+   } catch (Exception $ex) {
+
+       throw $ex->getMessage();
+   }
+
+   return $result;
+
+   }
+  
+   public function getCinemaScreening($id_cinema){
+
+    $screeningArray = $this->getCinemaScreeningBd($id_cinema);
+
+    $listScreening = [];
+
+    if(!empty($screeningArray)) {
+
+       foreach($screeningArray as $value){
+
+          array_push($listScreening ,ScreeningBdDAO::MapearScreening($value['id_screening']));
+       }
+
+       }else {
+
+            $listScreening = null;
+        }
+
+       
+        return $listScreening;
     }
 
-       /* private function BringGenresOfScreeningsDb() {
+   }
+
+
+
+/* private function BringGenresOfScreeningsDb() {
 
             $query = "select distinct g.id_genre, g.genrename 
                         FROM movie m
@@ -439,9 +615,13 @@ use FFI\Exception;
 
         }*/
 
+    ?>
+
+       
+
         
         
         
        
 
-?>
+
