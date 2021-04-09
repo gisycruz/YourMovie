@@ -27,6 +27,13 @@
               <li><a href="<?php echo FRONT_ROOT."Screening/ShowAddScreeningView" ?>">Add Screening </a></li>
             </ul>
           </li>
+          <li><a class="drop" href="#">Consult sales</a>
+            <ul>
+              <li><a href="<?php# echo FRONT_ROOT."" ?>">Cinema</a></li>
+              <li><a href="<?php echo FRONT_ROOT."Shopping/ShowSalesTicketMovie"?>">Movie </a></li>
+              <li><a href="<?php# echo FRONT_ROOT."" ?>">Date</a></li>
+            </ul>
+          </li>
     <?php }?>
     <li><a class="drop" href="#">Session</a>
           <ul>

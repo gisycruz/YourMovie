@@ -530,6 +530,43 @@ use FFI\Exception;
         return $listScreening;
     }
 
+
+public function sumCapacityByMovie($id_movie){
+
+    $query ="SELECT ifnull(sum(r.capacity),0) suma
+    from room r
+    inner join screening sc
+    on sc.idroom = r.id_room
+    inner join movie m
+    on sc.idmovie = m.id_movie 
+    where idmovie =(:idmovie)";
+
+    $parameters['idmovie'] =$id_movie;
+
+    try{
+
+     $this->connection = Connection::GetInstance();
+     $results = $this->connection->Execute($query, $parameters);
+    
+ } catch (Exception $ex) {
+     throw $ex;
+ }
+
+   $suma = null;
+
+ if(!empty($results)){
+
+     foreach($results as $res){
+        
+         $suma = $res['suma'];
+     }
+        
+ }
+ return $suma;
+
+}
+
+
    }
 
 

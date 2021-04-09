@@ -353,7 +353,7 @@ use Controllers\RoomController as RoomController;
         $genresOfScreenings =[];
         $datesOfScreenings=[];
         $MovieList =[];
-       
+        $MovieListId =[];
         $listScreeningWithSeatFreeAndfromNow = $this->movieController->getMoviesList();
     
         if(isset($listScreeningWithSeatFreeAndfromNow)){
@@ -361,13 +361,19 @@ use Controllers\RoomController as RoomController;
             foreach($listScreeningWithSeatFreeAndfromNow as $screening) {
     
                 if( $screening->getDate_screening() == $date && $screening->getMovie()->getGenre()->getGenreName() == $genre){
-                array_push($ListFiltre, $screening->getMovie());
+                array_push($MovieListId, $screening->getMovie()->getId_movie());
                 }
             }
     
+            $ListFiltre = array_unique($MovieListId);
+
             if(!empty($ListFiltre)){
     
-                $MovieList = $ListFiltre;
+               foreach($ListFiltre as $idMovie){
+                array_push($MovieList , MovieBdDAO::MapearMovie($idMovie));
+               }
+
+
 
                 $filterMessage = " || Date: " .  $date . " || Genre: " .  $genre ;
     
@@ -375,6 +381,7 @@ use Controllers\RoomController as RoomController;
     
                     array_push($datesOfScreenings ,$screening->getDate_screening());
                     array_push($genresOfScreenings , $screening->getMovie()->getGenre()->getGenreName());
+                    
     
                 }
 
@@ -407,7 +414,7 @@ use Controllers\RoomController as RoomController;
         $genresOfScreenings =[];
         $datesOfScreenings=[];
         $MovieList =[];
-       
+        $MovieListId =[];
         $listScreeningWithSeatFreeAndfromNow = $this->movieController->getMoviesList();
 
         foreach($listScreeningWithSeatFreeAndfromNow as $screening){
@@ -434,13 +441,16 @@ use Controllers\RoomController as RoomController;
             foreach($listScreeningWithSeatFreeAndfromNow as $screening) {
     
                 if( $screening->getDate_screening()  == $value){
-                array_push($ListFiltre, $screening->getMovie());
+                array_push($MovieListId, $screening->getMovie()->getId_movie());
                 }
             }
-    
+            $ListFiltre = array_unique($MovieListId);
+
             if(!empty($ListFiltre)){
-    
-                $MovieList = $ListFiltre;
+
+                foreach($ListFiltre as $idMovie){
+                    array_push($MovieList , MovieBdDAO::MapearMovie($idMovie));
+                   }
 
                 $filterMessage = " || Date: " .  $value;
 
@@ -458,13 +468,16 @@ use Controllers\RoomController as RoomController;
             foreach($listScreeningWithSeatFreeAndfromNow as $screening) {
     
                 if($screening->getMovie()->getGenre()->getGenreName() == $value){
-                array_push($ListFiltre, $screening->getMovie());
+                array_push($MovieListId, $screening->getMovie()->getId_movie());
                 }
             }
-    
+            $ListFiltre = array_unique($MovieListId);
+
             if(!empty($ListFiltre)){
 
-                $MovieList = $ListFiltre;
+                foreach($ListFiltre as $idMovie){
+                    array_push($MovieList , MovieBdDAO::MapearMovie($idMovie));
+                   }
                
               $filterMessage = " || Genre: " .  $value;
 
