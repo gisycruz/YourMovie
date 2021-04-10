@@ -83,39 +83,7 @@
 
         }
 
-        public function ShowSalesTicketCinema($message =""){
-
-            require_once(VIEWS_PATH."validate-session.php");
-
-            //require_once(VIEWS_PATH."sale-movie.php");
-
-        }
-
-        public function ShowSalesTicketMovie($id_movie = null,$message =""){
-
-            require_once(VIEWS_PATH."validate-session.php");
-
-            $listMovieShopping = $this->shoppingBdDAO->getMovieWithShopping();
-
-
-            if($id_movie != null){
-
-                $movie = MovieBdDAO::MapearMovie($id_movie);
-
-                $totalTicket =  $this->shoppingBdDAO->sumNumberOfPurchasesOfaMovie($id_movie);
-        
-                $capacityRoomMovie =  $this->screeningBdDAO->sumCapacityByMovie($id_movie);
-        
-                $Remnants = $capacityRoomMovie - $totalTicket;
-        
-                $totalMoneySold = $this->shoppingBdDAO->sumMoneyOfPurchasesOfaMovie($id_movie);
-
-            }
-
-            require_once(VIEWS_PATH."sale-movie.php");
-
-        }
-
+    
         public function addQuantityTicket($ticketQuantity , $id_screening){
 
             require_once(VIEWS_PATH."validate-sessionUser.php");

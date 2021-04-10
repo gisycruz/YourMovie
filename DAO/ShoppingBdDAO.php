@@ -229,48 +229,75 @@ class ShoppingBdDAO implements IShopping{
         return $suma;
         
     }
-     private function getMovieWithShoppingBd(){
 
-        $listMovie = [];
+    public function sumNumberOfPurchasesOfaCinema($id_cinema){
 
-        $query = "SELECT s.idmovie 
-        from screening s
-        inner join shopping sh
-        on s.id_screening = sh.idscreening
-        group by s.idmovie";
-       
-       try{
+        $query ="SELECT ifnull(sum(s.countrticket),0) suma 
+        from shopping s
+        inner join screening sc
+        on s.idscreening = sc.id_screening
+        inner join room r
+        on sc.idroom = r.id_room
+        where r.idcinema =(:idcinema)";
 
-        $this->connection = Connection::GetInstance();
-        $result = $this->connection->Execute($query);
+        $parameters['idcinema'] =$id_cinema;
 
+        try{
+ 
+         $this->connection = Connection::GetInstance();
+         $results = $this->connection->Execute($query, $parameters);
+        
+     } catch (Exception $ex) {
+         throw $ex;
+     }
 
-    } catch (Exception $ex) {
+       $suma = null;
 
-        throw $ex->getMessage();
-    }
+     if(!empty($results)){
 
-    return $result;
-
-}
-public function getMovieWithShopping() {
-
-    $listMovie = [];
+         foreach($results as $res){
             
-    $MovieArray = $this->getMovieWithShoppingBd();
+             $suma = $res['suma'];
+         }
+            
+     }
+     return $suma;
+     
+ } 
+ public function sumMoneyOfPurchasesOfaCinema($id_cinema){
 
-    if(!empty($MovieArray)){
+    $query ="SELECT ifnull(sum(s.total),0)suma 
+    from shopping s
+    inner join screening sc
+    on s.idscreening = sc.id_screening
+    inner join room r
+    on r.id_room = sc.idroom
+   where r.idcinema =(:idcinema)";
 
-       foreach($MovieArray as $value){
+    $parameters['idcinema'] =$id_cinema;
 
-       array_push($listMovie,MovieBdDAO::MapearMovie($value['idmovie']));
+    try{
 
-       }
-    }
-        return $listMovie;
-    }
+     $this->connection = Connection::GetInstance();
+     $results = $this->connection->Execute($query, $parameters);
+    
+ } catch (Exception $ex) {
+     throw $ex;
+ }
 
+   $suma = null;
 
+ if(!empty($results)){
+
+     foreach($results as $res){
+        
+         $suma = $res['suma'];
+     }
+        
+ }
+ return $suma;
+ 
+} 
     
     public function sumNumberOfPurchasesOfaMovie($id_movie){
 

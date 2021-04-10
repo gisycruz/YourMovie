@@ -6,6 +6,7 @@ use DAO\Connection as Connection;
 use DAO\QueryType as QueryType;
 use Models\Screening as Screening;
 use DAO\MovieBdDao as MovieBdDAO;
+use DAO\CinemaBdDAO as CinemaBdDAO;
 use Models\Room as Room;
 use DAO\RoomBdDao as RoomBdDAO;
 use DAO\ShoppingBdDAO as ShoppingBdDAO;
@@ -530,6 +531,81 @@ use FFI\Exception;
         return $listScreening;
     }
 
+    private function getCinemaWithScreeningBd(){
+
+    
+        $query = "SELECT r.idcinema
+        from room r
+        inner join screening s
+        on s.idroom = r.id_room
+        group by r.idcinema;";
+       
+       try{
+    
+        $this->connection = Connection::GetInstance();
+        $result = $this->connection->Execute($query);
+    
+    
+    } catch (Exception $ex) {
+    
+        throw $ex->getMessage();
+    }
+    
+    return $result;
+    
+    }
+
+    public function getCinemaWithScreening() {
+    
+    $listCinema = [];
+            
+    $cinemaArray = $this->getCinemaWithScreeningBd();
+    
+    if(!empty($cinemaArray)){
+    
+       foreach($cinemaArray as $value){
+    
+       array_push($listCinema,CinemaBdDAO::MapearCinema($value['idcinema']));
+    
+       }
+    }
+
+    return $listCinema;
+}
+public function sumCapacityByCinema($id_cinema){
+
+    $query ="SELECT ifnull(sum(r.capacity),0) suma
+    from room r
+    inner join screening sc
+    on sc.idroom = r.id_room
+    inner join cinema c
+    on r.idcinema = c.id_cinema 
+    where idcinema =(:idcinema)";
+
+    $parameters['idcinema'] =$id_cinema;
+
+    try{
+
+     $this->connection = Connection::GetInstance();
+     $results = $this->connection->Execute($query, $parameters);
+    
+ } catch (Exception $ex) {
+     throw $ex;
+ }
+
+   $suma = null;
+
+ if(!empty($results)){
+
+     foreach($results as $res){
+        
+         $suma = $res['suma'];
+     }
+        
+ }
+ return $suma;
+
+}
 
 public function sumCapacityByMovie($id_movie){
 
@@ -565,6 +641,55 @@ public function sumCapacityByMovie($id_movie){
  return $suma;
 
 }
+private function getMovieWithScreeningBd(){
+
+
+    $query = "SELECT s.idmovie
+    from screening s
+    inner join movie m
+    on s.idmovie = m.id_movie
+    group by s.idmovie;";
+   
+   try{
+
+    $this->connection = Connection::GetInstance();
+    $result = $this->connection->Execute($query);
+
+
+} catch (Exception $ex) {
+
+    throw $ex->getMessage();
+}
+
+return $result;
+
+}
+public function getMovieWithScreening() {
+
+    $listMovie = [];
+        
+$movieArray = $this->getMovieWithScreeningBd();
+
+if(!empty($movieArray)){
+
+   foreach($movieArray as $value){
+
+   array_push($listMovie,MovieBdDAO::MapearMovie($value['idmovie']));
+
+   }
+}
+  
+    return $listMovie;
+}
+
+
+
+
+
+
+
+
+
 
 
    }
