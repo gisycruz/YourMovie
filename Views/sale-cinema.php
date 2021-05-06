@@ -4,8 +4,8 @@ require_once('nav-bar.php');
 ?>
 <div class="wrapper row4 diseño" style="position: fixed;top: 23%; background-color: rgba(0,0,0,0);">
     <main class="container clear centrado" >
-        <div class="content">
-            <div id="comments">
+    <div class="content" style="background-color: rgba(0, 0, 0, 0);">
+      <div class="scrollable">
             <?php if ($message) { echo "<h3>" . $message . "</h3><br>";} ?>
                 <?php if($id_cinema == null){?>
                 <h2><span style="background-color: rgba(115, 64, 70, 0.9); padding: 10px">Choose a Cinema whit Screening <a href="#" style="font-size: 16px;"></a></span></h2>
@@ -22,34 +22,70 @@ require_once('nav-bar.php');
                         <br>
                     </div>
                     </form>
-                    <br>
-                    <?php }?>
-             <?php if(isset($totalTicket)  && isset($Remnants)  && isset($totalMoneySold)) {?>
+                    <?php }else{?>
+                        <div class="content" style="background-color: rgba(0, 0, 0, 0);">
+      
                 <span style="background-color: rgba(115, 64, 70, 0.9); padding: 10px"> Cinema :<?php echo $cinema->getName()?><a href="#" style="font-size: 16px;"></a></span></h2><br>
-                <br>
-                    <table style="width: 75%;">
-                        <thead>
-                            <tr>
-                                <th>Sold</th>
-                                <th>Remnants</th>
-                                <th>Total Money</th>
-                            </tr>
-                        </thead>
-                        <tbody align="center">
-                            <tr>    
-                                <td><?php echo $totalTicket ?></td>
-                                <td><?php echo $Remnants ?></td>
-                                <td><?php echo "$" . $totalMoneySold ?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div>
-                        <br>
-                        <button type="submit" name="id_cinema" class="btn" value="<?php# echo $cinema->GetId_Cinema() ?>" style="font-size: 12px"></button>
-                        <br>
-                    </div>
-               
-                <?php  }?>
+                 <br>
+                <table style="text-align:center;  width: 0;">
+          <thead>
+            <tr>
+            <th style="width: 10%;">Room</th>
+            <th style="width: 10%;" >Date</th>
+            <th style="width: 10%;" >Hour</th>
+            <th style="width: 10%;">Ticket Value</th>
+                <th style="width:10%;">Sold</th>
+                <th style="width:10%;">Remnants</th>
+            </tr>
+          </thead>
+          <tbody>
+          <?php
+           $sumaSold = 0;
+           $sumaRemnants =0;
+           $sumaMoney =0.00;
+             if(isset($listShopping)){ foreach($listShopping as $shopping){
+                 
+                 $screening = $shopping->getScreening();?>
+            <tr>
+                <td> <?php echo $screening->getroom()->getName();?> </td>
+                <td> <?php echo  date("d/m/Y", strtotime($screening->GetDate_screening()));?></td>
+                <td> <?php echo $screening->GetHour_screening(); ?> </td> 
+                <td> <?php echo "$". $shopping->getPriceRoom(); ?> </td> 
+                <?php 
+                $sold = $shopping->getCountrtiket();
+                $remnants = $screening->getroom()->getCapacity() - $sold;
+                $totalMoney = $shopping->getPriceRoom() * $sold;
+                $sumaSold = $sumaSold + $sold ;
+                $sumaRemnants = $sumaRemnants + $remnants;
+                $sumaMoney = $sumaMoney +  $totalMoney;
+            
+                ?>
+                    <td> <?php echo $sold ?> </td>
+                    <td> <?php echo $remnants?></td> 
+                    <?php }}?>   
+           
+            
+            </tr>  
+        </tbody>
+        </table>
+        </div>
+      
+           <table style="text-align:center;  width: 0;">
+          <thead>
+            <tr>
+            <th style="width: 15%;">Total Sold</th>
+            <th style="width: 15%;">Total Remnants</th>
+            <th style="width: 15%;" >Total Money</th>
+            </tr>
+          </thead>
+          <tbody>
+             <td> <?php echo  $sumaSold?></td> 
+             <td> <?php echo  $sumaRemnants ;?> </td>
+             <td> <?php echo "$".$sumaMoney ;?></td>    
+            </tr> 
+        </tbody>
+    <?php }?>
+        </table> 
                 </div>
             </div>
         </div>

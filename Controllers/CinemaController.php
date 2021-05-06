@@ -87,9 +87,10 @@ use PDOException;
 
             try{
 
-                if($result == 1){
-
             $result = $this->cinemaBdDAO->DeleteCinemaInDB($id_cinema);
+            
+            if($result == 1){
+
 
             $message = "Cinema Deleted Succefully!";
 

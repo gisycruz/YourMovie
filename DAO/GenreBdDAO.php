@@ -8,9 +8,9 @@ use DAO\Connection as Connection;
     class GenreBdDAO{
 
         private $tableName = "genre";
-        #private $connection;
+        private $connection;
         private $listGenres;
-        #private $fileJsonMovie = ROOT."/Data/Genre.json";
+       
 
         public function SaveGenreInDB(Genre $genre) {
 
@@ -47,7 +47,7 @@ use DAO\Connection as Connection;
             return $auxGenreBdDAO->GetGenreByIdFromDb($id_genre);
 
         }
-
+      
         public function GetGenreByIdFromDb($id_genre) {
     
             $query = "SELECT" . " id_genre, genreName FROM " . $this->tableName . " WHERE (id_genre = :id_genre) ";

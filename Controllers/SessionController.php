@@ -1,7 +1,6 @@
 <?php
 namespace Controllers;
 
-use DAO\UserDao as UserDao;
 use Models\User as User;
 use DAO\UserBdDAO as UserBdDAO;
 use Controllers\MovieController as MovieController;
@@ -12,11 +11,14 @@ use PDOException;
     class SessionController {
        
         private $userDAO ;
+        private $movieController;
+        private $Shopping;
 
         public function __construct()
         {
            $this->userDAO = new UserBdDAO();
-          
+           $this->movieController = new MovieController();
+           $this->Shopping = new ShoppingController();
         }
 
         //SignUp function
@@ -34,18 +36,14 @@ use PDOException;
            
             require_once(VIEWS_PATH."movie-list.php");
             }
-        } 
+        }
+         
         public function ShowLogInView($message = "")
         {
-
             require_once(VIEWS_PATH."login.php");
-            
-            /*else {
-            $id_movie = $message;
-            $message = "";
-            require_once(VIEWS_PATH."movie-list.php");
-            }*/
+    
         }       
+
        public function ShowViewsProfileUser($id_user, $message =""){
              
         require_once(VIEWS_PATH."validate-sessionUser.php");
@@ -90,18 +88,17 @@ use PDOException;
 
                      $_SESSION["loginAdmid"] = $user;
 
-                     $message = "Welcome admind Cinemas";
 
-                     $this->ShowAddCinema($message);
+                     $this->movieController->listMovies("Welcome admind");
 
                 }else{
                     if(isset($id_screening)){
 
-                     $this->LogInValidateUser($username,  $password,$id_screening);
+                     $this->LogInValidateUser($username,$password,$id_screening);
 
                     }else{
 
-                        $this->LogInValidateUser($username,  $password,$id_screening ="");
+                        $this->LogInValidateUser($username,$password,$id_screening ="");
                     }
                      }
 
@@ -117,7 +114,7 @@ use PDOException;
              }
     }
 
-        public function LogInValidateUser($email,  $password,$id_screening)
+        public function LogInValidateUser($email,$password,$id_screening)
      {
 
             $user = $this->userDAO->GetByUserName($email);
@@ -131,15 +128,15 @@ use PDOException;
 
                     if(isset($id_screening) && !empty($id_screening)){
 
-                        $Shopping = new ShoppingController();
+                        
 
-                        $Shopping->GetShopping($id_screening);
+                        $this->Shopping->GetShopping($id_screening);
 
                     }else{
 
-                    $movieController = new MovieController();
+                   
     
-                    $movieController->listMovies("Welcome!");
+                    $this->movieController->listMovies("Welcome!");
 
                     }
 
@@ -202,28 +199,21 @@ use PDOException;
             }
              else
             {
-                $message = "ERROR: Failed , reintente";
 
-               $this->ShowModifyUserViews($id_user, $message);
+               $this->ShowModifyUserViews($id_user,"ERROR: Failed , reintente");
                 
             }
 
               }catch(PDOException $ex){
 
-                   $message = $ex->getMessage();
+                   if(Functions::contains_substr($ex->getMessage(), "Duplicate entry")) {
 
-                   if(Functions::contains_substr($message, "Duplicate entry")) {
-
-                       $message = "User already exists, must use different user!!!";
-
-                       $this->ShowModifyUserViews($id_user, $message);
+                       $this->ShowModifyUserViews($id_user,"User already exists, must use different user!!!");
 
                     } 
                 }
 
         } 
-    
-
 
         //LogOutFunction
 

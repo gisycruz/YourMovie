@@ -199,6 +199,55 @@ class ShoppingBdDAO implements IShopping{
               return $id_shopping;
         }
 
+        private function GetShoppingToCinemaBd($id_cinema){
+
+            $query ="SELECT id_shopping,iduser,idscreening , dateShopping,countrticket,priceRoom ,total
+            from shopping s
+            inner join screening sc
+            on s.idscreening = sc.id_screening
+            inner join room r
+            on sc.idroom = r.id_room
+            where r.idcinema =(:idcinema)";
+    
+            $parameters['idcinema'] =$id_cinema;
+    
+            try{
+     
+             $this->connection = Connection::GetInstance();
+             $results = $this->connection->Execute($query, $parameters);
+            
+            } catch (Exception $ex) {
+
+                throw $ex->getMessage();
+            }
+            
+            return  $results;
+            
+            }
+            public function GetShoppingToCinema($id_cinema){
+            
+                $shoppingArray = $this->GetShoppingToCinemaBd($id_cinema);
+            
+                if(!empty($shoppingArray)) {
+                    
+                    $result = $this->mapear($shoppingArray);
+                    
+                    if(is_array($result)){
+
+                        $this->shoppingList = $result;
+                     }
+                     else{
+                
+                        $arrayResult[0] =$result;
+                        $this->shoppingList = $arrayResult;
+                     }
+                     return $this->shoppingList ;
+                
+                   }else{
+                
+                    return $errorArray[0] = "ERROR while reading the database.";
+                   }
+                }
 
 
         public function sumNumberOfPurchasesOfaScreening($id_screening){

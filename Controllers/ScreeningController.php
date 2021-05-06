@@ -30,6 +30,7 @@ use Controllers\RoomController as RoomController;
             $this->movieController = new MovieController();
         }
     
+        
         public function ShowAddScreeningView($id_cinema = null,$message = "") {
            
             require_once(VIEWS_PATH."validate-session.php");
@@ -49,11 +50,9 @@ use Controllers\RoomController as RoomController;
             
             if($roomList == null){
 
-                $message ="the cinema that i select does not have rooms !!";
-               
                 $roomController = new RoomController();
 
-                $roomController->ShowAddRoomView($id_cinema,$message);
+                $roomController->ShowAddRoomView($id_cinema,"the cinema that i select does not have rooms !!");
             }
 
             $movieList =$this->movieBdDAO->getAllMovies(); 
@@ -98,8 +97,12 @@ use Controllers\RoomController as RoomController;
             require_once(VIEWS_PATH."screening-modify.php");
             
         }
+        
+       
 
         private function addAscreening($id_room,$id_movie, $date_screening, $hour_screening,$id_cinema){
+
+            require_once(VIEWS_PATH."validate-session.php");
 
             $movie = MovieBdDao::MapearMovie($id_movie);  
     
@@ -109,19 +112,10 @@ use Controllers\RoomController as RoomController;
     
             $result = $this->screeningBdDAO->SaveScreeningInBd($newScreening);
     
-            if($result == 1) {
-    
-            $message = "Screening added succesfully!";
-    
-           $this->ShowAddScreeningView($id_cinema ,$message );
-    
-             }else{
-              
-            $message = "Screening added FAIL!";
-    
-            require_once(VIEWS_PATH."screening-list-from-room.php");    
-    
-            } 
+            if($result == 1) 
+           $this->ShowAddScreeningView($id_cinema ,"Screening added succesfully!");
+             else
+           $this->ShowScreeningsOfRoom( "Screening added FAIL!",$id_cinema,$id_room);
     
            }
 
@@ -155,12 +149,10 @@ use Controllers\RoomController as RoomController;
                         //total minutos entre medio 
                         $minBetween = $totalMinScreening[2]-$totalMinScreening[1];
                         
-                        if($minBetween>=0){
+                        if($minBetween>=0)
                             $minLeft = true;
-                
-                        }else{
+                        else
                             $minLeft = false;
-                        } 
                     }else{
                         //MINUTOS DE LA anterior al ingresar ,lo pongo en segundos las horas + los minutos ($screening->getHour_screening()) + los minutos de la pelicula + 15 minutos espera
                         $totalMinScreening[2] = ($arrayHMS[2][0]*60)+$arrayHMS[2][1]+$screening->getMovie()->getDuration()+$waitings[1][1];
@@ -169,16 +161,15 @@ use Controllers\RoomController as RoomController;
                         //total minutos entre medio 
                         $minBetween = $totalMinScreening[1]-$totalMinScreening[2];
                        
-                        if($minBetween>=0){
+                        if($minBetween>=0)
                             $minLeft = true;
-                
-                        }else{
+                        else
                             $minLeft = false;
-                        }
+                        
                      }
 
                 }
-                }//forr
+                }
             }
 
         return $minLeft;
@@ -201,9 +192,7 @@ use Controllers\RoomController as RoomController;
             
                 if(!$minLeft){
 
-                    $message = " Room occupied day ".$date_screening ." and Time ".$hour_screening ."!" ;
-
-                     $this->ShowAddScreeningView($id_cinema,$message);    
+                     $this->ShowAddScreeningView($id_cinema," Room occupied day ".$date_screening ." and Time ".$hour_screening ."!");    
                 
                 }else{
 
@@ -213,10 +202,8 @@ use Controllers\RoomController as RoomController;
             
             //si la sala no es igual existe una sala con esa pelicula
             }else{
-
-                $message = " The movie ".$screening->getMovie()->getTitle() ." is already projected for the day ".$date_screening." at cinema ".$screening->getRoom()->getCinema()->getName() ." And Room ". $screening->getRoom()->getName() ."" ;
             
-                $this->ShowAddScreeningView($id_cinema ,$message); 
+                $this->ShowAddScreeningView($id_cinema ," The movie ".$screening->getMovie()->getTitle() ." is already projected for the day ".$date_screening." at cinema ".$screening->getRoom()->getCinema()->getName() ." And Room ". $screening->getRoom()->getName() .""); 
 
               }
 
@@ -226,7 +213,7 @@ use Controllers\RoomController as RoomController;
         }
       
 
-    }//funcion 
+    }
 
 
 
@@ -236,19 +223,10 @@ use Controllers\RoomController as RoomController;
 
         $room = RoomBdDao::MapearRoom($id_room);
 
-        if($result == 1) {
-            
-            $message = "Screening Modify Succefully!";
-
-            $this->ShowScreeningsOfRoom($message, $room->getCinema()->getId_Cinema(), $id_room); 
-        }
+        if($result == 1) 
+            $this->ShowScreeningsOfRoom("Screening Modify Succefully!", $room->getCinema()->getId_Cinema(), $id_room); 
         else
-        {
-            
-            $message = "ERROR: Failed in screening delete, reintente";
-            $this->ShowScreeningsOfRoom($message, $room->getCinema()->getId_Cinema(), $id_room); 
-        }
-
+            $this->ShowScreeningsOfRoom("ERROR: Failed in screening delete, reintente", $room->getCinema()->getId_Cinema(), $id_room); 
 
     }
            
@@ -263,34 +241,20 @@ use Controllers\RoomController as RoomController;
 
            $minLeft =  $this->evaluateTheTimeBetweenMvies($id_room,$date_screening,$hour_screening);
             
-                if(!$minLeft){
-
-                    $message = "Room occupied day ".$date_screening ."and Time ".$hour_screening ."!" ;
-
-                    $this->ShowModififyView($id_screening,$message);  
-                
-                }else{
-
+                if(!$minLeft)
+                    $this->ShowModififyView($id_screening,"Room occupied day ".$date_screening ."and Time ".$hour_screening ."!" );  
+                else
                 $this->modyfyScreening($id_movie,$date_screening,$hour_screening, $id_room,$id_screening);
-                
-                }
             
             //si la sala no es igual existe una sala con esa pelicula
             }else{
-
-                $message = " The movie ".$screening->getMovie()->getTitle() ." is already projected for the day ".$date_screening." at cinema ".$screening->getRoom()->getCinema()->getName() ." And Room ". $screening->getRoom()->getName() ."" ;
-            
-                $this->ShowModififyView($id_screening,$message); 
+                $this->ShowModififyView($id_screening," The movie ".$screening->getMovie()->getTitle() ." is already projected for the day ".$date_screening." at cinema ".$screening->getRoom()->getCinema()->getName() ." And Room ". $screening->getRoom()->getName() .""); 
 
               }
 
-        }else{//cargar no hay funcion para esa pelicula
-
+        }else//cargar no hay funcion para esa pelicula
             $this->modyfyScreening($id_movie,$date_screening,$hour_screening, $id_room,$id_screening);
-        }
-      
-
-    }//funcion 
+    } 
 
             
     
@@ -304,215 +268,21 @@ use Controllers\RoomController as RoomController;
 
             $room = RoomBdDao::MapearRoom($id_room);
 
-            if($result == 1) {
-                
-                $message = "Screening Deleted Succefully!";
-
-                $this->ShowScreeningsOfRoom($message, $room->getCinema()->getId_Cinema(), $id_room); 
-            }
+            if($result == 1) 
+                $this->ShowScreeningsOfRoom("Screening Deleted Succefully!", $room->getCinema()->getId_Cinema(), $id_room); 
             else
-            {
-                $message = "ERROR: Failed in screening delete, reintente";
-
-                $this->ShowScreeningsOfRoom($message, $room->getCinema()->getId_Cinema(), $id_room); 
-            }
+              $this->ShowScreeningsOfRoom("ERROR: Failed in screening delete, reintente", $room->getCinema()->getId_Cinema(), $id_room); 
+            
         }
         
 
-        public function ApplyFilters($date,$genre) 
-        {
-            if(isset($_GET)){
-
-                if(!empty($date) && !empty($genre)){
-
-                $this->listMoviesWithFilterDateAndGenre($date,$genre);
-                
-                }else if(!empty($date)){
-
-                    $this->listMoviesWithFilter("date", $date);
-                }
-                else if (!empty($genre)){
-
-                   
-                    $this->listMoviesWithFilter("genre", $genre);
-                }
-                else if(empty($date) && empty($genre)){
-
-        
-                    $message = "Si desea filtrar las peliculas en cartelera<br>Recuerde asignar correctamente los filtros.<br>(Date->Date // Genre->Genre)";
-
-                    $this->movieController->listMovies($message);
-                }
-        
-        } 
-    } 
-
-    public function listMoviesWithFilterDateAndGenre($date, $genre) {
-
-        $ListFiltre =[];
-        $genresOfScreenings =[];
-        $datesOfScreenings=[];
-        $MovieList =[];
-        $MovieListId =[];
-        $listScreeningWithSeatFreeAndfromNow = $this->movieController->getMoviesList();
-    
-        if(isset($listScreeningWithSeatFreeAndfromNow)){
-    
-            foreach($listScreeningWithSeatFreeAndfromNow as $screening) {
-    
-                if( $screening->getDate_screening() == $date && $screening->getMovie()->getGenre()->getGenreName() == $genre){
-                array_push($MovieListId, $screening->getMovie()->getId_movie());
-                }
-            }
-    
-            $ListFiltre = array_unique($MovieListId);
-
-            if(!empty($ListFiltre)){
-    
-               foreach($ListFiltre as $idMovie){
-                array_push($MovieList , MovieBdDAO::MapearMovie($idMovie));
-               }
-
-
-
-                $filterMessage = " || Date: " .  $date . " || Genre: " .  $genre ;
-    
-                foreach($listScreeningWithSeatFreeAndfromNow as $screening){
-    
-                    array_push($datesOfScreenings ,$screening->getDate_screening());
-                    array_push($genresOfScreenings , $screening->getMovie()->getGenre()->getGenreName());
-                    
-    
-                }
-
-                $datesOfScreenings = array_unique($datesOfScreenings);
-                $genresOfScreenings = array_unique($genresOfScreenings);
-                sort($genresOfScreenings);
-                sort($datesOfScreenings);
-
-                $count = 0;
-                if(is_array($MovieList) && !empty($MovieList)) {
-                $cantidadDeMovies = count($MovieList);
-                }
-    
-                require_once(VIEWS_PATH. "movie-list.php");
-    
-            }else{
-               
-           $message = "I do not know find a movie in function whith the date and genre"; 
-    
-           $this->movieController->listMovies($message);
-    
-           }
-        }
-    }
-
-
-    public function listMoviesWithFilter($filter, $value) {
-
-        $ListFiltre =[];
-        $genresOfScreenings =[];
-        $datesOfScreenings=[];
-        $MovieList =[];
-        $MovieListId =[];
-        $listScreeningWithSeatFreeAndfromNow = $this->movieController->getMoviesList();
-
-        foreach($listScreeningWithSeatFreeAndfromNow as $screening){
-    
-            array_push($datesOfScreenings ,$screening->getDate_screening());
-            array_push($genresOfScreenings , $screening->getMovie()->getGenre()->getGenreName());
-
-        }
-           
-        $datesOfScreenings = array_unique($datesOfScreenings);
-        $genresOfScreenings = array_unique($genresOfScreenings);
-        sort($genresOfScreenings);
-        sort($datesOfScreenings);
-
-        $count = 0;
-        if(is_array($MovieList) && !empty($MovieList)) {
-        $cantidadDeMovies = count($MovieList);
-        }
-
-        if(isset($listScreeningWithSeatFreeAndfromNow)){
-
-            if($filter == "date") {
-    
-            foreach($listScreeningWithSeatFreeAndfromNow as $screening) {
-    
-                if( $screening->getDate_screening()  == $value){
-                array_push($MovieListId, $screening->getMovie()->getId_movie());
-                }
-            }
-            $ListFiltre = array_unique($MovieListId);
-
-            if(!empty($ListFiltre)){
-
-                foreach($ListFiltre as $idMovie){
-                    array_push($MovieList , MovieBdDAO::MapearMovie($idMovie));
-                   }
-
-                $filterMessage = " || Date: " .  $value;
-
-                require_once(VIEWS_PATH. "movie-list.php");
-
-            }else{
-
-                $message = "I do not know find a movie in function whith the date "; 
-        
-                $this->movieController->listMovies($message);
-            }
-
-        }else if($filter == "genre"){
-        
-            foreach($listScreeningWithSeatFreeAndfromNow as $screening) {
-    
-                if($screening->getMovie()->getGenre()->getGenreName() == $value){
-                array_push($MovieListId, $screening->getMovie()->getId_movie());
-                }
-            }
-            $ListFiltre = array_unique($MovieListId);
-
-            if(!empty($ListFiltre)){
-
-                foreach($ListFiltre as $idMovie){
-                    array_push($MovieList , MovieBdDAO::MapearMovie($idMovie));
-                   }
-               
-              $filterMessage = " || Genre: " .  $value;
-
-              require_once(VIEWS_PATH. "movie-list.php");
-
-            }else{
-
-                $message = "I do not know find a movie in function whith the genre "; 
-        
-                $this->movieController->listMovies($message);
-              }
-          
-
-          }
-       }
- 
-    }
-    
+       
 
 public function GetAllScreeningsFromMovie($id_movie) {
     return $this->screeningBdDAO->GetScreeningsFromAMovie($id_movie);
 
 }
 
-/*public function GetGenresOfScreenings() {
-   return $this->screeningBdDAO->GetGenresOfScreenings();
-}
-
-public function GetDatesOfScreenings() {
-    return $this->screeningBdDAO->GetDatesOfScreenings();
-}*/
-
-
-
-    
 
 }
 

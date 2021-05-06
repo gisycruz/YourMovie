@@ -61,7 +61,7 @@ class UserBdDAO implements Iuser{
 
     protected function mapear($value) {
         
-        $value = is_array($value) ? $value : [];
+        $value =($value) ? $value : [];
 
         $resp = array_map(function($p){
             $user = new User($p['username'], $p['password'], $p['role'],$p['firstName'],$p['lastName'],$p['dni'],$p['birthDate']);

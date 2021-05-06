@@ -55,7 +55,7 @@ require_once('nav-bar.php');
                                     </select>
                                 </td>
                                 <td style="max-width: 25%; align-items: center; vertical-align: middle;">
-                                <input type="date" name ="date" min="<?php echo date("Y-m-d")?>"  required >
+                                <input type="date" name ="date" min="<?php echo date("Y-m-d",strtotime(date("Y-m-d")."- 1 days"));?>"  required >
                                 </td>
                                 <td style="max-width: 25%; align-items: center; vertical-align: middle;">
                                 <input type="time"  min="<?php date_default_timezone_set('America/Argentina/Ushuaia'); echo date("Y-m-d(H:i)",time()) ;?>" name ="Time" required >

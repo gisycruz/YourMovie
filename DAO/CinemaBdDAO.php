@@ -80,7 +80,7 @@ class CinemaBdDao implements Icinema{
 
         return $return;
     }  
-
+    
     public function SaveCinemaInDB(Cinema $cinema) {
 
         $sql = "INSERT INTO cinema (name, address) VALUES (:name, :address)";
@@ -95,7 +95,7 @@ class CinemaBdDao implements Icinema{
             throw $ex;
         }
     }
-
+    
     public function DeleteCinemaInDB($id_cinema) {
   
         $sql = "CALL deleteCinema(?)";

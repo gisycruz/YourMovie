@@ -88,30 +88,18 @@ class RoomController
 
                     $result = $this->roomBdDAO->SaveRoomInBd($newRoom);
 
-                    if($result == 1) {
-
-                        $message = "Room added succesfully!";
-
-                        $this->ShowAddRoomView($id_cinema,$message);
-                     } 
-                     else
-                     {
-                         $message = "ERROR: Failed in room Add, reintente";
+                    if($result == 1) 
+                        $this->ShowAddRoomView($id_cinema,"Room added succesfully!"); 
+                     else 
+                         $this->ShowAddRoomView($id_cinema, "ERROR: Failed in room Add, reintente");
                          
-                         $this->ShowAddRoomView($id_cinema,$message);
-                         
-                     }
+                     
                     
                 } catch (PDOException $ex){
 
-                    $message = $ex->getMessage();
-
-                    if(Functions::contains_substr($message, "Duplicate entry")) {
-
-                        $message = "some of the data entered";
-
-                        $this->ShowAddRoomView($id_cinema,$message);
-                    }
+                    if(Functions::contains_substr($ex->getMessage(), "Duplicate entry"))
+                     $this->ShowAddRoomView($id_cinema,"some of the data entered");
+                    
                 }
             
         }  
@@ -124,33 +112,19 @@ class RoomController
 
             $result = $this->roomBdDAO->DeleteRoomInDB($id_room);
 
-            if($result == 1) {
-
-                $message = "Room Deleted Succefully!";
-
-                $this->ShowListRoomView($message, $id_cinema); 
-            }
+            if($result == 1)
+                $this->ShowListRoomView("Room Deleted Succefully!", $id_cinema); 
             else
-            {
-                $message = "ERROR: Failed in room delete, reintente";
-
-                $this->ShowListRoomView($message, $id_cinema);
-            }
+                $this->ShowListRoomView("ERROR: Failed in room delete, reintente", $id_cinema);
 
         } catch (PDOException $ex){
 
-            $message = $ex->getMessage();
-
-            if(Functions::contains_substr($message,"Result consisted of more than one row")) {
-
-                $message = "has associated screening cannot be deleted !! you must delete screening";
-                
-                $this->ShowListRoomView($message, $id_cinema); 
-            }
+            if(Functions::contains_substr($ex->getMessage(),"Result consisted of more than one row"))   
+                $this->ShowListRoomView("has associated screening cannot be deleted !! you must delete screening", $id_cinema); 
         }
       }
 
-      public function modify($name, $capacity, $ticketValue, $id_room){
+        public function modify($name, $capacity, $ticketValue, $id_room){
 
             require_once(VIEWS_PATH."validate-session.php");
 
@@ -160,29 +134,18 @@ class RoomController
 
             $room = RoomBdDAO::MapearRoom($id_room);
 
-            if($result == 1){
-
+            if($result == 1)
             $this->ShowListRoomView("Room modify succesfully!", $room->getCinema()->getId_Cinema());
-
-            }
              else
-            {
-                $message = "ERROR: Failed in room modify, reintente";
-
-                $this->ShowListRoomView($message, $room->getCinema()->getId_Cinema());
-            }
+                $this->ShowListRoomView("ERROR: Failed in room modify, reintente", $room->getCinema()->getId_Cinema());
+            
 
               }catch(PDOException $ex){
 
-                   $message = $ex->getMessage();
+                   if(Functions::contains_substr($ex->getMessage(), "Duplicate entry")) 
+                       $this->ShowModififyView($id_room,"There is already a room with the same name to change!!!");
 
-                   if(Functions::contains_substr($message, "Duplicate entry")) {
-
-                       $message = "There is already a room with the same name to change!!!";
-
-                       $this->ShowModififyView($id_room,$message);
-
-                    } 
+                     
                 }
 
         } 

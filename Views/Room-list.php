@@ -26,10 +26,9 @@ require_once('nav-bar.php');
                     <td> <?php echo $Room->GetCapacity(); ?></td>
                     <td> <?php echo " $ " . $Room->GetTicketValue(); ?></td>
                     <td>
-                <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Room/RemoveRoomFromDB?id_cinema=".$Room->getCinema()->getId_Cinema()."&id_room=".$Room->getId_room();?>" style="color:#f5f3ed;">Remove</a></button>
-                <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Room/ShowModififyView?id_room=".$Room->getId_room();?>" style="color:#f5f3ed;">Modify</a></button>
                 <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Screening/ShowScreeningsOfRoom?message=". $message = "" ."&id_cinema=".$Room->getCinema()->getId_Cinema()."&id_room=".$Room->getId_room();?>" style="color:#f5f3ed;">Show Screenig </a></button>
-                
+                <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Room/ShowModififyView?id_room=".$Room->getId_room();?>" style="color:#f5f3ed;">Modify</a></button>
+                <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Room/RemoveRoomFromDB?id_cinema=".$Room->getCinema()->getId_Cinema()."&id_room=".$Room->getId_room();?>" style="color:#f5f3ed;">Remove</a></button>
                     </td>
                   </tr>
               <?php

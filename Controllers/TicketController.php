@@ -29,8 +29,10 @@ class TicketController
         require_once(VIEWS_PATH."validate-sessionUser.php");
        
         $Listticket = $this->ticketBdDAO->GetTicketFromShopping($id_shopping);
-        
+
         require_once(VIEWS_PATH."ticketUser.php");
+
+        
 
     }
     public function ShowTicketObtainedUser($id_user, $message =""){
@@ -38,9 +40,7 @@ class TicketController
         require_once(VIEWS_PATH."validate-sessionUser.php");
 
         $Listticket = $this->ticketBdDAO->getAuserSticketIdMapear($id_user);
-
         
-
          require_once(VIEWS_PATH."ticketUser.php");
 
     }
@@ -96,20 +96,11 @@ class TicketController
 
                 }
 
-                if($result == 1){
-
-                        $message = "The purchase of the ticket was successfully carried out!!. ";
-
-
-                         $this->ShowTicketUserViews($id_shopping,$message);
-
-                         
-                }else{
-
-                    $message = "ERROR: Failed in screening delete, reintente";
-  
-                }
-                    
+                if($result == 1)
+                 $this->ShowTicketUserViews($id_shopping,"The purchase of the ticket was successfully carried out!!. ");
+               else
+               $message = "ERROR: Failed in screening delete, reintente";
+      
             }
                
             
@@ -123,9 +114,7 @@ public function sendtoemail($email,$id_Shopping){
 
     $mail->sendMail($email,$ticketList);
 
-    $message = "The tickets were sent with QR to your mail . CHECK..!!";
-
-    $this->MovieController->listMovies($message);
+    $this->MovieController->listMovies("The tickets were sent with QR to your mail . CHECK..!!");
 
 }
 

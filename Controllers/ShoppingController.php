@@ -105,54 +105,43 @@
     
                 $total = $screening->getRoom()->getTicketValue() * $ticketQuantity;
     
-                $message = "If you wisd before loading  the car you can modify the quantities";
-    
-                $this->ShowATotalShoppingViews($ticketQuantity,$id_screening,$total,$message);
+                $this->ShowATotalShoppingViews($ticketQuantity,$id_screening,$total,"If you wisd before loading  the car you can modify the quantities");
 
             }else{
 
-                $message = "excuse !! the room is full they have not left a seat for that amount of tickets there is only ". $unoccupiedSeats." places";
-
-                $this->ShowAddShoppingViews($id_screening,$message);
+                $this->ShowAddShoppingViews($id_screening, "excuse !! the room is full they have not left a seat for that amount of tickets there is only ". $unoccupiedSeats." places");
             }
 
            }
 
         public function GetShopping($id_screening) {
            
-
-            if(!isset($_SESSION['loginUser'])){
-             
-                $message = "To get a ticket yuo must be logged in ..!";
-
-                $this->ShowLoginIfNotLoging($message,$id_screening);
-
-            }else{
-
-                $message ="welcome a Shopping to ticket";
-
-            $this->ShowAddShoppingViews($id_screening,$message);
-
-            }
+            if(!isset($_SESSION['loginUser']))
+                $this->ShowLoginIfNotLoging("To get a ticket yuo must be logged in ..!",$id_screening);
+                else
+                 $this->ShowAddShoppingViews($id_screening,"welcome a Shopping to ticket");
             
         }
-        
-       public function validateCard($inputNumero,$month,$year,$ccv,$id_screening ,$ticketQuantity)
-       {
 
+
+        
+       public function validateCard($inputNumero,$month,$year,$ccv,$ticketQuantity,$id_screening,$var = false)
+       {
+        
         require_once(VIEWS_PATH."validate-sessionUser.php");
+
          if(isset($_GET)){
+
         $companyCard = "";
         $fecha = $year."-".$month;
-        $requestAuthorizationfrom ="";
        
         $fecha_actual = strtotime(date("Y-m"));
         $fecha_entrada = strtotime("$fecha");
         $longNumberCard = strlen($inputNumero);
         $longCcvCard = strlen($ccv);
 
-
-        if($longNumberCard == 19)
+            
+        if($longNumberCard == 19 )
         {
 
             if($inputNumero[0] == 4){
@@ -165,48 +154,38 @@
 
              }else{
 
-                $message =  " Card not supported .";
-
-                $this->ShowAddCardViews($id_screening ,$ticketQuantity ,$message);
+                $this->ShowAddCardViews($id_screening ,$ticketQuantity ," Card not supported .");
 
              }
               if($fecha_actual > $fecha_entrada){
 
-                $message =  " Expired Card .";
-
-                $this->ShowAddCardViews($id_screening ,$ticketQuantity ,$message);
+                $this->ShowAddCardViews($id_screening ,$ticketQuantity ," Expired Card .");
     
                 }
                  if($longCcvCard != 3){
-
-                    $message = "Some ccv number is missing..!";
         
-                    $this->ShowAddCardViews($id_screening ,$ticketQuantity ,$message);
+                    $this->ShowAddCardViews($id_screening ,$ticketQuantity ,"Some ccv number is missing..!");
 
                 }else{
 
-                    $requestAuthorizationfrom= $companyCard;
-                    $inputNumero= null ;
-                    $month = null;
-                    $year =null;
-                    $ccv = null;
-                   
-                $this->addShopping($id_screening,$ticketQuantity);
+                $var = true;
+
+               $this->addShopping($id_screening,$ticketQuantity);
+
                 }
     
         }else{
-            $message = "The card number needs to be completed..!";
-        
-            $this->ShowAddCardViews($id_screening ,$ticketQuantity ,$message);
-
+            $this->ShowAddCardViews($id_screening ,$ticketQuantity ,"The card number needs to be completed..!");
         }
+
+
     }
-        return $requestAuthorizationfrom;
+   
+       
     }
 
-     
-       
        public function addShopping($id_screening,$ticketQuantity) {
+
 
         require_once(VIEWS_PATH."validate-sessionUser.php");
 
@@ -242,29 +221,18 @@
 
       $this->ShowAddTicketUserViews($id_shopping);
 
-          }else{
-             $message = "ERROR: reintente";
-
-              $this->ShowAddShoppingViews($id_screening,$message);
-          }
+          }else
+              $this->ShowAddShoppingViews($id_screening,"ERROR: reintente");
 
      }catch(PDOException $ex){
 
-          $message = $ex->getMessage();
-
-          if(Functions::contains_substr($message, "Duplicate entry")) {
-
-              $message = "The purchase already exists!!!";
-
-              $this->MovieController->listMovies($message);
+          if(Functions::contains_substr($ex->getMessage(),"Duplicate entry")) 
+              $this->MovieController->listMovies("The purchase already exists!!!");
               
-           } 
 
     }
        }
-
-
-      
+  
        
    }
    ?>

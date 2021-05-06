@@ -55,15 +55,15 @@
 			</button>
 		</div>
 		<!-- Formulario -->
-		<form action="<?php echo FRONT_ROOT."Shopping/validateCard"?>" id="formulario-tarjeta" method = "get" class="formulario-tarjeta" >
+		<form action="<?php echo FRONT_ROOT."Shopping/validateCard"?>" id="formulario-tarjeta" method = "post" autocomplete="off"    class="formulario-tarjeta" >
 			<div class="grupo">
 			
 				<label for="inputNumero">Card Number</label>
-				<input type="text" id="inputNumero" name ="inputNumero"  maxlength="19"  autocomplete="off"  required/>
+				<input type="text" id="inputNumero" name ="inputNumero"  maxlength="19" autocomplete="false" required/>
 			</div>
 			<div class="grupo">
 				<label for="inputNombre">Name and Surname</label>
-				<input type="text" id="inputNombre" maxlength="19" autocomplete="off" required>
+				<input type="text" id="inputNombre" maxlength="19" required>
 			</div>
 			<div class="flexbox">
 				<div class="grupo expira">
@@ -87,14 +87,13 @@
 				</div>
 				<div class="grupo ccv">
 					<label for="inputCCV">CCV</label>
-					<input type="text" id="inputCCV" name ="inputCCV" maxlength="3" autocomplete="off" required>
+					<input type="text" id="inputCCV" name ="inputCCV" maxlength="3" required>
 					<br>
 			<br>
 			</div>
 			</div>
-			<input name="id_screening" type="hidden" value="<?php echo $id_screening ;?>">
 			<input name="ticketQuantity" type="hidden" value="<?php echo $ticketQuantity;?>">
-			<button type="submit" class="btn-enviar">Sent</button>
+			<button type="submit" name="id_screening"value="<?php echo $id_screening ;?>" class="btn-enviar">Sent</button>
 		</form>
 	</div>
 	<script src="https://kit.fontawesome.com/2c36e9b7b1.js" crossorigin="anonymous"></script>

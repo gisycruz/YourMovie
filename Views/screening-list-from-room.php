@@ -27,7 +27,7 @@
             <tr>
                 <td> <?php echo $Screening->GetRoom()->getCinema()->getName()."/".$Screening->GetRoom()->getName(); ?> </td>
                 <td> <?php echo $Screening->GetMovie()->getTitle(); ?> </td>
-                <td> <?php echo $Screening->GetDate_screening(); ?> </td>
+                <td> <?php echo date("d/m/Y", strtotime($Screening->GetDate_screening())); ?> </td>
                 <td> <?php echo $Screening->GetHour_screening(); ?> </td>          
                 <td>
                 &nbsp;

@@ -114,7 +114,7 @@ class MovieBdDao implements Imovie {
 
     return count($resp) > 1 ? $resp : $resp['0'];
    }
-
+   
    public function getMoviesWithScreeningFromDB() {
         
     $query = "SELECT DISTINCT m.id_movie,s.id_screening, m.title, m.language, m.url_image, m.duration, m.overview, m.idgenre FROM movie m INNER JOIN SCREENING s ON s.idmovie = m.id_movie";
@@ -130,7 +130,7 @@ class MovieBdDao implements Imovie {
     return $result;
 
 }
- 
+
 
    public function getAllMoviesWithScreening(){
 
@@ -281,6 +281,7 @@ public static function GetInstance()
 
         return $this->GetUpcomingMoviesFromAPIDB();
     }
+    
 
     private function GetUpcomingMoviesFromAPIDB() {
 

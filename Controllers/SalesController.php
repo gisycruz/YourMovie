@@ -5,20 +5,29 @@
     use DAO\ScreeningBdDAO as ScreeningBdDAO;
     use DAO\MovieBdDAO as  MovieBdDAO;
     use DAO\CinemaBdDAO as CinemaBdDAO;
+    use Controllers\MovieController as MovieController;
 
     class SalesController
     {       
-        
+        private $movieController;
         private $shoppingBdDAO;
         private $screeningBdDAO;
 
 
         public function __construct() {
-
+           $this->movieController = new MovieController();
            $this->shoppingBdDAO = ShoppingBdDAO::getInstance();
            $this->screeningBdDAO = new ScreeningBdDAO();
 
         }
+
+
+
+
+
+
+
+       
 
     public function ShowSalesTicketCinema($id_cinema = null ,$message =""){
 
@@ -32,12 +41,9 @@
            
             $cinema = CinemaBdDAO::MapearCinema($id_cinema);
 
-           $totalTicket =  $this->soldCinema($id_cinema);
-
-           $Remnants = $this->notSoldCinema($id_cinema);
+          $listShopping =  $this->shoppingBdDAO->GetShoppingToCinema($id_cinema);
     
-        $totalMoneySold = $this->getSoldmoneyCinema($id_cinema);
-
+           
         }
         require_once(VIEWS_PATH."sale-cinema.php");
         
@@ -51,35 +57,7 @@
 
 
 
-    public function ShowSalesTicketMovie($id_movie = null,$message =""){
-
-        require_once(VIEWS_PATH."validate-session.php");
-
-        $listMovieScreening = $this->getMovieWithScreenigSales();
-
-        if(isset($listMovieScreening)){
-
-        if($id_movie != null){
-
-            $movie = MovieBdDAO::MapearMovie($id_movie);
-
-            $totalTicket =  $this->soldMovie($id_movie);
-
-            $Remnants = $this->notSoldMovie($id_movie);
     
-            $totalMoneySold = $this->getSoldmoneyMovie($id_movie);
-
-        }
-
-        require_once(VIEWS_PATH."sale-movie.php");
-
-    }else{
-
-        $message = "not screening add";
-
-    } 
-
-    }
 
     private function getCinemaWthScreenig(){
 

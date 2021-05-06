@@ -3,7 +3,7 @@
     namespace Models;
     use Models\Room as Room ;
     use Models\Movie as Movie ;
-    
+    use DAO\ShoppingBdDAO as ShoppingBdDAO;
 
     class Screening {
 
@@ -12,7 +12,7 @@
         private $movie;
         private $date_screening; 
         private $hour_screening; 
-        
+        private $shoppingBdDAO;
         
         public function __construct(Room $room, Movie $movie ,$date_screening,$hour_screening) 
         {
@@ -20,6 +20,7 @@
             $this->hour_screening = $hour_screening;
             $this->room = $room;
             $this->movie = $movie;
+            $this->shoppingBdDAO = new ShoppingBdDAO();
         }
 
     public function getId_screening(){return $this->id_screening;}
@@ -34,7 +35,13 @@
     public function setRoom($room){ $this->room = $room;}
     public function getCinema() { return $this->cinema;}
     public function setCinema($cinema) { $this->cinema = $cinema;}
-
+    public function soldScreening($id_screening){
+        return   $this->shoppingBdDAO->sumNumberOfPurchasesOfaScreening($id_screening);
+    }
+    public function RemnantsScrrening($id_screening){
+      return  $this->getRoom()->getCapacity() - $this->soldScreening($id_screening);
+       
+    }
 }
 
 

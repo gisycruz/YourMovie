@@ -26,9 +26,9 @@ require_once("validate-session.php");
                 <td><?php echo $Cinema->GetName();?></td>
                 <td><?php echo $Cinema->GetAddress();?> </td>         
                 <td>
-                <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Cinema/RemoveCinemaFromDB?id_cinema=". $Cinema->getId_Cinema();?>" style="color:#f5f3ed;">Remove</a></button>
-                <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Cinema/ShowModififyView?id_cinema=". $Cinema->getId_Cinema();?>" style="color:#f5f3ed;">Modify</a></button>
                 <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Room/ShowRoomListCinemas?id_cinema=". $Cinema->getId_Cinema();?>"style="color:#f5f3ed;">Show Rooms</a></button>
+                <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Cinema/ShowModififyView?id_cinema=". $Cinema->getId_Cinema();?>" style="color:#f5f3ed;">Modify</a></button>
+                <button class="btn" style="font-size: 12px"> <a href="<?php echo FRONT_ROOT."Cinema/RemoveCinemaFromDB?id_cinema=". $Cinema->getId_Cinema();?>" style="color:#f5f3ed;">Remove</a></button>
                 </td>  
             </tr> 
           <?php 

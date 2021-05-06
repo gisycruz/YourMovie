@@ -684,13 +684,91 @@ if(!empty($movieArray)){
 
 
 
+private function getScreeningToDateBd($date_screening){
 
 
+    $query = "SELECT * from ". $this->tableName." WHERE  date_screening =(:dateScreening)";
+
+    $parameters['dateScreening'] =$date_screening;
+   try{
+
+    $this->connection = Connection::GetInstance();
+    $result = $this->connection->Execute($query,$parameters);
 
 
+} catch (Exception $ex) {
+
+    throw $ex->getMessage();
+}
+
+return $result;
+
+}
+public function getScreeningToDate($date_screening){
+
+    $screeningArray = $this->getScreeningToDateBd($date_screening);
+
+    if(!empty($screeningArray)) {
+        
+        $result = $this->mapear($screeningArray);
+        
+        if(is_array($result)) {
+            
+            $this->listScreening = $result;
+        }
+        else {
+            
+            $arrayResult[0] = $result;
+            $this->listScreening = $arrayResult;
+        }
+    }
+    
+    return $this->listScreening;
+}
+
+private function getScreeningDatedesdeHastaBd($date_desde ,$date_hasta){
 
 
+    $query = "SELECT * from ". $this->tableName." WHERE  date_screening BETWEEN (:dateDesde) AND (:dateHasta) 
+    ORDER BY  date_screening  desc";
 
+    $parameters['dateDesde'] =$date_desde;
+    $parameters['dateHasta'] =$date_hasta;
+   try{
+
+    $this->connection = Connection::GetInstance();
+    $result = $this->connection->Execute($query,$parameters);
+
+
+} catch (Exception $ex) {
+
+    throw $ex->getMessage();
+}
+
+return $result;
+
+}
+public function getScreeningDatedesdeHasta($date_desde ,$date_hasta){
+
+    $screeningArray = $this->getScreeningDatedesdeHastaBd($date_desde ,$date_hasta);
+
+    if(!empty($screeningArray)) {
+        
+        $result = $this->mapear($screeningArray);
+        
+        if(is_array($result)) {
+            
+            $this->listScreening = $result;
+        }
+        else {
+            
+            $arrayResult[0] = $result;
+            $this->listScreening = $arrayResult;
+        }
+    }
+    
+    return $this->listScreening;
+}
 
    }
 

@@ -2,19 +2,25 @@
     namespace Controllers;
 
 use DAO\GenreBdDAO;
-use Exception;
 use Controllers\MovieController as MovieController;
-
+use Exception;
 
 class HomeController
     {
+        private $MovieController;
+        private $GenresBdDAO;
+       
+        public function __construct() {
+
+        $this->MovieController = new MovieController();
+        $this->GenresBdDAO = new GenreBdDAO();
+          
+        }
+
         public function Index($message = "")
         {   
             $this->InicSystem();
-            $MovieController = new MovieController();
-            $MovieController->listMovies();
-           
-            
+            $this->MovieController->listMovies();   
         }
         
         public function ShowWeAreWorkingView() {
@@ -24,12 +30,11 @@ class HomeController
         private function InicSystem() {
             
             try{
-            $GenresBdDAO = new GenreBdDAO();
-            $GenresBdDAO->GetGenresFromAPI();
-            $MovieController = new MovieController();
-            $MovieController->GetNowPlayingFromAPI();
+            $this->GenresBdDAO->GetGenresFromAPI();
+            $this->MovieController->GetNowPlayingFromAPI();
+
             } catch (Exception $ex) {
-                return;
+                return $ex;
             }
         }
     }

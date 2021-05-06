@@ -8,9 +8,6 @@
     <nav id="mainav" class="fl_right fixed-top">
       <ul class="clear">
         <li class="active"> <a href="<?php echo FRONT_ROOT . "Home/Index"; ?>">Main Menu</a> </li>
-        <li>
-        <a href="<?php echo FRONT_ROOT . "Movie/listMovies" ?>">Movies</a>
-        </li>
         <?php if( !isset($_SESSION['loginAdmid'])  &&  !isset($_SESSION['loginUser'])){?>
         <li>
           <a href="<?php echo FRONT_ROOT ."Session/ShowLogInView"; ?>">Log In</a>
@@ -20,6 +17,9 @@
 
             if(isset($_SESSION["loginAdmid"])){
         ?>
+         <li>
+        <a href="<?php echo FRONT_ROOT ."Movie/listMoviesScreenig"?>">Screening</a>
+        </li>
          <li><a class="drop" href="#">Cinemas</a>
             <ul>
               <li><a href="<?php echo FRONT_ROOT."Cinema/ShowAddCinemaView" ?>">add Cinema</a></li>
@@ -29,9 +29,8 @@
           </li>
           <li><a class="drop" href="#">Consult sales</a>
             <ul>
-              <li><a href="<?php echo FRONT_ROOT."Sales/ShowSalesTicketCinema" ?>">Cinema</a></li>
-              <li><a href="<?php echo FRONT_ROOT."Sales/ShowSalesTicketMovie"?>">Movie </a></li>
-              <li><a href="<?php# echo FRONT_ROOT."" ?>">Date</a></li>
+            <li><a href="<?php echo FRONT_ROOT."Movie/ShowSalesTicketMovie"?>">By Movie</a></li>
+            <li><a href="<?php echo FRONT_ROOT."Sales/ShowSalesTicketCinema" ?>">By Cinema</a></li>
             </ul>
           </li>
     <?php }?>
